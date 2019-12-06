@@ -1,0 +1,15 @@
+{:paths ["resources" "src"]
+ :deps  {org.clojure/clojure          {:mvn/version "RELEASE"}
+         org.clojure/tools.cli        {:mvn/version "0.4.2"}
+         digest                       {:mvn/version "1.4.9"}
+         arachne-framework/valuehash  {:git/url "https://github.com/arachne-framework/valuehash"
+                                       :sha     "ff1d4b7f1260daf41c786a61cb45d02871b7baf9"}}
+ :aliases
+ {:test {:extra-paths ["test"]
+         :extra-deps  {org.clojure/test.check {:mvn/version "RELEASE"}}}
+  :runner
+  {:extra-deps {com.cognitect/test-runner
+                {:git/url "https://github.com/cognitect-labs/test-runner"
+                 :sha     "76568540e7f40268ad2b646110f237a60295fa3c"}}
+   :main-opts  ["-m" "cognitect.test-runner"
+                "-d" "test"]}}}
