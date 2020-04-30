@@ -29,7 +29,7 @@ The output is a line per project, with the path to the project file, space, hash
 
 ## License
 
-Copyright © 2019 FIXME
+Copyright © 2010 Yummly
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
