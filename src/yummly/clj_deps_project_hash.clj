@@ -19,13 +19,15 @@
 (defn project-files-in-tree [root]
   (let [root (io/file root)
         files (file-seq root)]
-    (filter project-file? files)))
+    (->> files
+         (filter project-file?)
+         sort)))
 
 (defn normalize-deps
   "Make local/root paths canonical"
   [project-file deps]
   (let [project-dir (-> (io/file project-file) .getAbsoluteFile .getParent io/file)]
-    (into {}
+    (into (sorted-map)
           (for [[k v] deps]
             [k (update v :local/root #(when %
                                         (-> (io/file project-dir % "deps.edn")
@@ -52,7 +54,8 @@
                      (map io/file))
 
         files        (->> (mapcat file-seq paths)
-                          (filter code-file?))
+                          (filter code-file?)
+                          sort)
         project-hash (v/sha-1-str project)
         file-hashes  (mapv digest/sha1 files)
         hashes       (->> (cons project-hash file-hashes)
@@ -83,8 +86,9 @@
   (let [root (-> root io/file (.getCanonicalPath))
         projects (project-files-in-tree root)
         project-file-hashes (mapv #(file->project-hash % [:dev :test :check]) projects)
-        project->hash (zipmap (map :project-file project-file-hashes)
-                              (map :hash project-file-hashes))
+        project->hash (into (sorted-map)
+                            (zipmap (map :project-file project-file-hashes)
+                                    (map :hash project-file-hashes)))
         inverted-local-deps (reduce
                              (fn [from->to {:keys [project-file local-deps]}]
                                (merge-with set/union
@@ -92,8 +96,9 @@
                                            (zipmap local-deps (repeat #{project-file}))))
                              (zipmap (keys project->hash) (repeat #{}))
                              project-file-hashes)
-        local-deps (zipmap (map :project-file project-file-hashes)
-                           (map (comp set :local-deps) project-file-hashes))
+        local-deps (into (sorted-map)
+                         (zipmap (map :project-file project-file-hashes)
+                                 (map (comp set :local-deps) project-file-hashes)))
         local-deps (unroll local-deps)]
     (zipmap
      (keys project->hash)
